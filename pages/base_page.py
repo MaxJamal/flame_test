@@ -1,0 +1,44 @@
+from urllib.parse import urlparse
+from pages.config import Config
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from pages.locators import AuthLocators
+
+
+class BasePage:
+
+    def __init__(self, driver, url, timeout=10):
+        self.driver = driver
+        self.url = Config.BASE_URL
+        self.driver.implicitly_wait(timeout)
+
+    def get_all_link(self):
+        url = urlparse(self.driver.current_url)
+        return url
+
+    def get_relative_link(self):  # нужно установить библиотеку urlib
+        url = urlparse(self.driver.current_url)
+        return url.path
+
+    def find_element(self, locator, timeout=10):
+        return WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located(locator),
+                                                         message=f"Поиск {locator} длился больше 10 секунд, операция прервана...")
+
+    def find_elements(self, locator, timeout=10):
+        return WebDriverWait(self.driver, timeout).until(EC.presence_of_all_elements_located(locator),
+                                                         message=f"Поиск {locator} длился больше 10 секунд, операция прервана...")
+
+    def go_to_reg_page(self):
+        """Перейти на страницу "Регистрация" со страницы авторизации """
+        reg_button = self.find_element(AuthLocators.REG_BTN)
+        reg_button.click()
+
+    def go_to_reset_password_page(self):
+        """Перейти на страницу "Забыл пароль" со страницы авторизации """
+        reset_password_button = self.find_element(AuthLocators.RES_BTN)
+        reset_password_button.click()
+
+    def click_logo(self):
+        """Переход на страницу авторизация с помощью кнопки с изображением логотипа"""
+        logo_btn = self.find_element(AuthLocators.LOGO_BTN)
+        logo_btn.click()
